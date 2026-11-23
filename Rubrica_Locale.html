@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rubrica Aziendale</title>
+
+  <style>
+    :root {
+      --navy:       #0d1b2e;
+      --navy-mid:   #152338;
+      --navy-light: #1e3352;
+      --blue:       #2563eb;
+      --blue-light: #3b82f6;
+      --blue-pale:  #dbeafe;
+      --steel:      #64748b;
+      --steel-light:#94a3b8;
+      --silver:     #cbd5e1;
+      --ash:        #e2e8f0;
+      --white:      #f8fafc;
+      --pure-white: #ffffff;
+      --text-dark:  #0f172a;
+      --text-mid:   #334155;
+      --text-soft:  #64748b;
+      --danger:     #ef4444;
+      --danger-bg:  #fef2f2;
+      --success:    #10b981;
+      --warning:    #f59e0b;
+      --note-bg:    #fffbeb;
+      --note-border:#fde68a;
+      --note-color: #92400e;
+      --radius-sm:  6px;
+      --radius:     10px;
+      --radius-lg:  16px;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.08);
+      --shadow:     0 4px 16px rgba(0,0,0,.10);
+      --shadow-lg:  0 12px 40px rgba(0,0,0,.14);
+      --transition: .22s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { font-family: Arial, sans-serif; background: var(--white); color: var(--text-dark); min-height: 100vh; line-height: 1.6; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: var(--silver); border-radius: 10px; }
+    .hidden { display: none !important; }
+
+    /* ===== TOAST ===== */
+    #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+    .toast { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: var(--navy); color: #fff; border-radius: var(--radius); box-shadow: var(--shadow-lg); font-size: .875rem; font-weight: 500; pointer-events: auto; animation: toastIn .3s ease forwards; max-width: 340px; }
+    .toast.success { background: var(--success); }
+    .toast.error   { background: var(--danger); }
+    .toast.warning { background: var(--warning); color: var(--text-dark); }
+    .toast.hide    { animation: toastOut .3s ease forwards; }
+    @keyframes toastIn  { from { opacity:0; transform:translateY(12px) scale(.97); } to { opacity:1; transform:none; } }
+    @keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateY(12px); } }
+
+    /* ===== MODAL ===== */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(13,27,46,.55); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity var(--transition); }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+    .modal { background: var(--pure-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 100%; max-width: 560px; padding: 32px; transform: scale(.95) translateY(8px); transition: transform var(--transition); max-height: 90vh; overflow-y: auto; }
+    .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+    .modal h2 { font-family: Georgia, serif; font-size: 1.4rem; color: var(--navy); margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+    .modal h2 i { font-size: 1.1rem; color: var(--blue); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+
+    /* ===== FORMS ===== */
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: .78rem; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--ash); border-radius: var(--radius-sm); font-family: Arial, sans-serif; font-size: .9rem; color: var(--text-dark); background: var(--white); transition: border-color var(--transition), box-shadow var(--transition); outline: none; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+    .form-group input::placeholder { color: var(--steel-light); }
+
+    /* Toggle switch */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--white); border: 1.5px solid var(--ash); border-radius: var(--radius-sm); margin-bottom: 16px; }
+    .toggle-label { display: flex; align-items: center; gap: 8px; font-size: .875rem; color: var(--text-mid); font-weight: 500; }
+    .toggle-label i { color: var(--steel); font-size: .85rem; }
+    .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: var(--silver); border-radius: 22px; transition: background var(--transition); cursor: pointer; }
+    .toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform var(--transition); box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+    .toggle-switch input:checked + .toggle-slider { background: var(--danger); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    /* Color picker */
+    .color-picker-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent; transition: transform var(--transition), border-color var(--transition); }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.selected { border-color: var(--text-dark); }
+
+    /* Rich text editor toolbar */
+    .rte-toolbar { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; background: var(--white); border: 1.5px solid var(--ash); border-bottom: none; border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+    .rte-btn { width: 30px; height: 30px; border: none; background: transparent; border-radius: 4px; cursor: pointer; color: var(--text-mid); font-size: .85rem; display: flex; align-items: center; justify-content: center; transition: background var(--transition); font-family: serif; font-weight: bold; }
+    .rte-btn:hover { background: var(--ash); }
+    .rte-btn.active { background: var(--blue-pale); color: var(--blue); }
+    .rte-separator { width: 1px; height: 22px; background: var(--ash); margin: 4px 2px; align-self: center; }
+    .rte-select { height: 30px; border: 1px solid var(--ash); border-radius: 4px; font-family: Arial, sans-serif; font-size: .8rem; color: var(--text-mid); background: var(--white); padding: 0 6px; cursor: pointer; outline: none; }
+    .rte-select:focus { border-color: var(--blue); }
+    .rte-content { min-height: 140px; max-height: 300px; overflow-y: auto; padding: 12px 14px; border: 1.5px solid var(--ash); border-radius: 0 0 var(--radius-sm) var(--radius-sm); font-family: Arial, sans-serif; font-size: .9rem; color: var(--text-dark); background: var(--white); outline: none; line-height: 1.6; }
+    .rte-content:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+    .rte-content:empty::before { content: attr(data-placeholder); color: var(--steel-light); pointer-events: none; }
+
+    /* ===== BUTTONS ===== */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 20px; border: none; border-radius: var(--radius-sm); font-family: Arial, sans-serif; font-size: .875rem; font-weight: 600; cursor: pointer; transition: background var(--transition), transform var(--transition), box-shadow var(--transition); white-space: nowrap; }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37,99,235,.35); }
+    .btn-secondary { background: var(--ash); color: var(--text-mid); }
+    .btn-secondary:hover { background: var(--silver); }
+    .btn-danger { background: var(--danger-bg); color: var(--danger); }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-note { background: var(--note-bg); color: var(--note-color); border: 1px solid var(--note-border); }
+    .btn-note:hover { background: #fef3c7; }
+    .btn-icon { width: 34px; height: 34px; min-width: 44px; min-height: 44px; padding: 0; border-radius: var(--radius-sm); background: transparent; color: var(--steel); border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: .85rem; transition: background var(--transition), color var(--transition); }
+    .btn-icon:hover { background: var(--ash); color: var(--text-dark); }
+    .btn-icon.danger:hover { background: var(--danger-bg); color: var(--danger); }
+
+    /* ===== APP LAYOUT ===== */
+    #app { display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--navy); color: #fff; padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.2); }
+    .topbar-brand { display: flex; align-items: center; gap: 12px; }
+    .topbar-brand-icon { width: 36px; height: 36px; background: rgba(255,255,255,.08); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--blue-light); }
+    .topbar-brand-text h1 { font-family: Georgia, serif; font-size: 1.1rem; color: #fff; line-height: 1.2; }
+    .topbar-brand-text span { font-size: .72rem; color: var(--steel-light); }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .main-content { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 36px 24px 60px; }
+
+    /* TOOLBAR */
+    .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+    .search-wrap { flex: 1; min-width: 220px; position: relative; display: flex; align-items: center; }
+    .search-wrap .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--steel-light); font-size: .9rem; pointer-events: none; z-index: 1; }
+    #search-input { width: 100%; padding: 10px 48px 10px 40px; border: 1.5px solid var(--ash); border-radius: var(--radius-sm); font-family: Arial, sans-serif; font-size: .9rem; color: var(--text-dark); background: var(--pure-white); transition: border-color var(--transition), box-shadow var(--transition); outline: none; height: 42px; }
+    #search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+    #search-input::placeholder { color: var(--steel-light); }
+    .clear-search { position: absolute; right: 0; top: 0; bottom: 0; width: 44px; background: none; border: none; cursor: pointer; color: var(--steel-light); font-size: .85rem; display: flex; align-items: center; justify-content: center; transition: color var(--transition); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+    .clear-search:hover { color: var(--text-dark); background: var(--ash); }
+    .toolbar-actions { display: flex; gap: 8px; }
+
+    /* STATS */
+    .stats-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-pill { display: flex; align-items: center; gap: 7px; padding: 7px 14px; background: var(--pure-white); border: 1px solid var(--ash); border-radius: 100px; font-size: .8rem; color: var(--text-soft); box-shadow: var(--shadow-sm); }
+    .stat-pill strong { color: var(--text-dark); font-weight: 700; }
+    .stat-pill i { color: var(--blue); font-size: .75rem; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 64px 24px; color: var(--steel); }
+    .empty-state i { font-size: 3rem; color: var(--silver); margin-bottom: 16px; display: block; }
+    .empty-state h3 { font-size: 1.1rem; color: var(--text-mid); margin-bottom: 6px; }
+    .empty-state p { font-size: .875rem; }
+
+    /* ===== OFFICE CARDS ===== */
+    .offices-list { display: flex; flex-direction: column; gap: 14px; }
+    .office-card { background: var(--pure-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--ash); overflow: hidden; transition: box-shadow var(--transition); }
+    .office-card:hover { box-shadow: var(--shadow); }
+    .office-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; user-select: none; transition: background var(--transition); }
+    .office-header:hover { background: var(--white); }
+    .office-color-bar { width: 4px; height: 36px; border-radius: 4px; flex-shrink: 0; }
+    .office-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .office-name { flex: 1; min-width: 0; }
+    .office-name h2 { font-size: 1rem; font-weight: 700; color: var(--text-dark); line-height: 1.3; }
+    .office-name .office-count { font-size: .78rem; color: var(--text-soft); margin-top: 1px; }
+    .office-badge { padding: 3px 10px; border-radius: 100px; font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .office-chevron { color: var(--steel-light); font-size: .85rem; transition: transform var(--transition); margin-left: 4px; }
+    .office-card.open .office-chevron { transform: rotate(180deg); }
+    .office-actions { display: flex; gap: 4px; margin-left: 4px; }
+    .office-body { max-height: 0; overflow: hidden; transition: max-height .35s cubic-bezier(.4,0,.2,1); }
+    .office-card.open .office-body { max-height: 3000px; }
+    .office-body-inner { padding: 0 20px 20px; }
+    .employees-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 14px; border-top: 1px solid var(--ash); }
+    .employees-header span { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-soft); }
+    .employees-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+    .employee-card { background: var(--white); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--ash); transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition); animation: empIn .2s ease forwards; }
+    @keyframes empIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+    .employee-card:hover { border-color: var(--silver); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+    .emp-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .9rem; font-weight: 700; flex-shrink: 0; color: #fff; }
+    .emp-info { flex: 1; min-width: 0; }
+    .emp-name { font-size: .875rem; font-weight: 700; color: var(--text-dark); white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+    .emp-phone { font-size: .78rem; color: var(--text-soft); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+    .emp-phone i { font-size: .7rem; }
+    .emp-phone a { color: inherit; text-decoration: none; transition: color var(--transition); }
+    .emp-phone a:hover { color: var(--blue); }
+    .emp-phone .reserved { color: var(--steel-light); font-style: italic; }
+    .emp-actions { display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity var(--transition); }
+    .employee-card:hover .emp-actions { opacity: 1; }
+    .no-employees { grid-column: 1/-1; text-align: center; padding: 20px; color: var(--steel-light); font-size: .85rem; }
+    .highlight { background: #fef08a; border-radius: 2px; padding: 0 1px; }
+
+    /* ===== NOTES SECTION (bottom of page) ===== */
+    .notes-section { margin-top: 40px; }
+    .notes-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--ash); }
+    .notes-section-title { font-family: Georgia, serif; font-size: 1.3rem; color: var(--navy); display: flex; align-items: center; gap: 10px; }
+    .notes-section-title i { color: var(--warning); font-size: 1.1rem; }
+    .notes-list { display: flex; flex-direction: column; gap: 10px; }
+    .note-card { background: var(--pure-white); border: 1px solid var(--note-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: box-shadow var(--transition); }
+    .note-card:hover { box-shadow: var(--shadow); }
+    .note-card-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; cursor: pointer; user-select: none; background: var(--note-bg); transition: background var(--transition); }
+    .note-card-header:hover { background: #fef3c7; }
+    .note-card-icon { width: 34px; height: 34px; background: rgba(245,158,11,.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--warning); font-size: .9rem; flex-shrink: 0; }
+    .note-card-title { flex: 1; font-size: .95rem; font-weight: 700; color: var(--text-dark); }
+    .note-card-meta { font-size: .75rem; color: var(--text-soft); }
+    .note-card-actions { display: flex; gap: 2px; flex-shrink: 0; }
+    .note-card-chevron { color: var(--steel-light); font-size: .8rem; transition: transform var(--transition); margin-left: 6px; }
+    .note-card.open .note-card-chevron { transform: rotate(180deg); }
+    .note-card-body { max-height: 0; overflow: hidden; transition: max-height .35s cubic-bezier(.4,0,.2,1); }
+    .note-card.open .note-card-body { max-height: 2000px; }
+    .note-card-content { padding: 16px 20px; border-top: 1px solid var(--note-border); font-size: .9rem; color: var(--text-dark); line-height: 1.7; }
+    .note-card-content h1, .note-card-content h2, .note-card-content h3 { margin-bottom: 8px; color: var(--navy); }
+    .note-card-content p { margin-bottom: 6px; }
+    .note-card-content ul, .note-card-content ol { padding-left: 20px; margin-bottom: 6px; }
+    .note-card-content strong { font-weight: 700; }
+    .note-card-content em { font-style: italic; }
+    .notes-empty-state { text-align: center; padding: 40px 24px; color: var(--steel); }
+    .notes-empty-state i { font-size: 2.5rem; color: var(--silver); margin-bottom: 12px; display: block; }
+    .notes-empty-state p { font-size: .875rem; }
+
+    /* ===== LOADING ===== */
+    #loading-overlay { position: fixed; inset: 0; background: var(--white); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 4000; transition: opacity .3s; }
+    #loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--ash); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-overlay p { font-size: .875rem; color: var(--text-soft); }
+
+    /* ===== CONFIRM ===== */
+    #confirm-overlay { position: fixed; inset: 0; background: rgba(13,27,46,.55); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity var(--transition); }
+    #confirm-overlay.active { opacity: 1; pointer-events: all; }
+    .confirm-box { background: var(--pure-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 32px; max-width: 400px; width: 90%; text-align: center; transform: scale(.95); transition: transform var(--transition); }
+    #confirm-overlay.active .confirm-box { transform: scale(1); }
+    .confirm-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--danger-bg); color: var(--danger); font-size: 1.4rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+    .confirm-box h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+    .confirm-box p { font-size: .875rem; color: var(--text-soft); margin-bottom: 24px; line-height: 1.6; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+
+    @media (max-width: 600px) {
+      .topbar { padding: 0 16px; height: auto; min-height: 64px; flex-wrap: wrap; gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+      .topbar-brand-text span { display: none; }
+      .main-content { padding: 20px 14px 48px; }
+      .toolbar { gap: 8px; }
+      .login-card { padding: 32px 24px 28px; }
+      .employees-grid { grid-template-columns: 1fr; }
+      .toolbar-actions { flex-wrap: wrap; gap: 6px; }
+      .btn { padding: 8px 14px; font-size: .8rem; }
+    }
+  </style>
+
+<style>
+@media print {
+ @page { size: A4; margin: 12mm; }
+ .toolbar, .btn, .btn-icon, .office-actions, .office-chevron, .notes-section, .modal-overlay { display: none !important; }
+ .office-body, .office-card.open .office-body { max-height: none !important; overflow: visible !important; transition: none !important; }
+ .office-card { overflow: visible !important; box-shadow: none !important; margin-bottom: 12px; }
+ .employee-card { break-inside: avoid; animation: none !important; transform: none !important; opacity: 1 !important; }
+ .employees-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ .emp-name { white-space: normal !important; overflow: visible !important; overflow-wrap: anywhere; }
+ .office-header { break-after: avoid; }
+ body { background: white !important; }
+}
+</style>
+<style>.toolbar-actions{flex-wrap:wrap}.main-content{max-width:1100px}.emp-actions{opacity:1} .fa-solid,.fa-regular{font-style:normal}</style>
+<style>
+.toolbar { display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
+.toolbar .search-wrap { flex:1 1 auto; min-width:180px; }
+.toolbar-actions { flex:0 0 auto; flex-wrap:nowrap; }
+.btn-office { background:#dc2626; color:white; }
+.btn-office:hover { background:#b91c1c; }
+#btn-new-note { background:#fef3c7; color:#92400e; border:1px solid #fbbf24; }
+#btn-new-note:hover { background:#fde68a; }
+.functions-menu { position:relative; flex:0 0 auto; }
+.functions-menu summary { list-style:none; display:flex; align-items:center; justify-content:center; width:42px; height:42px; border:1px solid #cbd5e1; border-radius:6px; background:white; color:#334155; cursor:pointer; font-size:22px; }
+.functions-menu summary::-webkit-details-marker { display:none; }
+.functions-menu summary:hover { background:#e2e8f0; }
+.functions-menu summary:focus-visible { outline:3px solid #93c5fd; outline-offset:2px; }
+.functions-panel { position:absolute; right:0; top:calc(100% + 8px); z-index:150; min-width:210px; padding:8px; background:white; border:1px solid #e2e8f0; border-radius:10px; box-shadow:0 12px 30px #0f172a24; display:flex; flex-direction:column; gap:6px; }
+.functions-panel .btn { justify-content:flex-start; }
+@media(max-width:700px) {
+ .toolbar { flex-wrap:wrap; }
+ .toolbar .search-wrap { flex-basis:100%; }
+ .toolbar-actions { flex:1 1 auto; gap:6px; }
+ .toolbar-actions .btn { padding:9px 11px; }
+}
+@media print { .functions-menu {display:none!important} }
+</style>
+
+<style>
+.workspace-layout { display:grid; grid-template-columns:220px minmax(0,1fr); gap:28px; width:100%; max-width:1540px; padding:28px 24px 60px; margin:0 auto; align-items:start; }
+.office-sidebar { position:sticky; top:88px; max-height:calc(100vh - 112px); overflow-y:auto; padding:16px 10px; border:1px solid #e2e8f0; border-radius:14px; background:white; }
+.office-sidebar h2 { padding:0 10px 12px; font-size:14px; color:#475569; }
+#office-navigation { display:flex; flex-direction:column; gap:4px; }
+.office-nav-button { display:flex; align-items:center; gap:9px; width:100%; text-align:left; padding:10px; border:0; border-radius:7px; background:transparent; color:#334155; font:600 13px Arial,sans-serif; cursor:pointer; }
+.office-nav-button:hover { background:#f1f5f9; }
+.office-nav-button[aria-current="true"] { background:#dbeafe; color:#1d4ed8; }
+.office-nav-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.office-nav-name { flex:1; }
+.office-nav-count { font-size:11px; color:#64748b; }
+.workspace-layout .main-content { min-width:0; max-width:none; padding:0; margin:0; }
+.employees-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr)); gap:14px; }
+.employee-card { min-width:0; padding:16px 18px; gap:12px; min-height:86px; }
+.emp-info { min-width:0; flex:1 1 auto; }
+.emp-name { white-space:normal; word-break:normal; overflow-wrap:normal; line-height:1.45; }
+.emp-actions { gap:0; }
+.emp-actions .btn-icon { min-width:36px; width:36px; }
+.office-card { scroll-margin-top:88px; }
+.office-card.open .office-body { max-height:none; }
+@media(max-width:1050px) { .workspace-layout {grid-template-columns:185px minmax(0,1fr);gap:18px;padding:24px 16px;} .toolbar{flex-wrap:wrap;} .toolbar .search-wrap{flex-basis:100%;} .employees-grid{grid-template-columns:1fr;} }
+@media(max-width:700px) { .workspace-layout{display:block;padding:18px 14px;} .office-sidebar{position:static;max-height:210px;margin-bottom:20px;} #office-navigation{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));} }
+@media print { .office-sidebar{display:none!important;} .workspace-layout{display:block;padding:0;} .employees-grid{grid-template-columns:1fr;} .office-card{scroll-margin-top:0;} }
+</style>
+<style>.notes-nav-button{border-top:1px solid #e2e8f0;margin-top:8px;padding-top:14px;} #notes-section{scroll-margin-top:88px;} #notes-section:focus,.office-header:focus{outline:none;} .note-card.open .note-card-body{max-height:none;}</style>
+<style>
+.offline-label{font:600 12px Arial,sans-serif;color:#cbd5e1;}
+#modal-note {padding:20px;}
+#modal-note .modal {width:min(960px,100%);max-width:960px!important;padding:26px;max-height:calc(100dvh - 40px);overflow-y:auto;}
+#modal-note h2{margin-bottom:18px;}
+#modal-note .rte-toolbar {display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px;}
+#modal-note .rte-toolbar .rte-select {width:auto!important;min-width:130px;height:36px;padding:6px 10px;line-height:normal;flex:0 1 auto;margin:0;}
+#modal-note .rte-btn {width:auto;min-width:36px;height:34px;padding:5px 9px;font:600 12px Arial,sans-serif;background:white;border:1px solid #cbd5e1;line-height:1.2;white-space:nowrap;color:#334155;}
+#modal-note .rte-btn:hover{background:#f1f5f9;}
+#modal-note .rte-btn.active{background:#dbeafe;border-color:#60a5fa;}
+#modal-note .rte-color{display:flex;align-items:center;gap:5px;font:600 12px Arial,sans-serif;text-transform:none;letter-spacing:normal;margin:0;padding:0 4px;}
+#modal-note .rte-color input{width:30px!important;height:30px;padding:2px;border:1px solid #cbd5e1;border-radius:4px;}
+#modal-note .rte-content{min-height:260px;max-height:40vh;line-height:1.65;padding:16px;font-size:15px;overflow-wrap:anywhere;}
+.rte-content ul,.rte-content ol,.note-card-content ul,.note-card-content ol{padding-left:26px;}
+.rte-content p,.note-card-content p{margin-bottom:8px;}
+.rte-content blockquote,.note-card-content blockquote{border-left:3px solid #94a3b8;padding-left:14px;color:#475569;margin:10px 0;}
+.rte-content pre,.note-card-content pre{white-space:pre-wrap;font-family:Consolas,monospace;background:#f1f5f9;padding:12px;border-radius:6px;}
+.rte-content hr,.note-card-content hr{border:0;border-top:1px solid #cbd5e1;margin:14px 0;}
+.note-word-count{font-size:12px;color:#64748b;margin-top:8px;}
+#modal-note.expanded .modal{width:calc(100vw - 40px);max-width:none!important;height:calc(100dvh - 40px);}
+#modal-note.expanded .rte-content{max-height:none;height:calc(100dvh - 390px);min-height:200px;}
+#modal-note .modal-actions{margin-top:14px;}
+@media(max-width:600px){#modal-note{padding:8px;}#modal-note .modal{padding:16px;max-height:calc(100dvh - 16px);}#modal-note .rte-content{min-height:200px;} }
+</style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Caricamento in corso…</p>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-brand-icon"><span class="fa-solid fa-address-book" aria-hidden="true">▣</span></div>
+      <div class="topbar-brand-text">
+        <h1>Rubrica Aziendale</h1>
+        <span>Contatti interni · archivio locale</span>
+      </div>
+    </div>
+    <span class="offline-label">● Locale · Offline</span>
+  </header>
+
+  <div class="workspace-layout">
+    <aside class="office-sidebar" aria-label="Navigazione uffici">
+      <h2>Uffici</h2>
+      <nav id="office-navigation" aria-label="Vai a un ufficio"></nav>
+    </aside>
+  <main class="main-content">
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input type="text" id="search-input" placeholder="Cerca per nome, cognome o numero…" autocomplete="off">
+        <button class="clear-search hidden" id="clear-search" aria-label="Cancella ricerca">×</button>
+      </div>
+      <div class="toolbar-actions" id="primary-toolbar-actions">
+        <button class="btn btn-office" id="btn-add-office">+ Ufficio</button>
+        <button class="btn btn-primary" id="btn-add-employee">+ Dipendente</button>
+        <button class="btn btn-note" id="btn-new-note">+ Nota</button>
+      </div>
+      <details class="functions-menu" id="functions-menu">
+        <summary aria-label="Altre funzioni" title="Altre funzioni">☰</summary>
+        <div class="functions-panel">
+          <button class="btn btn-secondary" id="btn-print-all">Stampa / PDF</button>
+          <button class="btn btn-secondary" id="backup-export">Esporta backup</button>
+          <button class="btn btn-secondary" id="backup-import">Importa backup</button>
+          <button class="btn btn-secondary" id="btn-export-names">Esporta nomi</button>
+        </div>
+      </details>
+      <input type="file" id="backup-file" accept=".json,application/json" hidden>
+      <div id="unused-toolbar-actions" style="display:none"></div>
+    </div>
+
+    <p id="local-status" style="margin-bottom:16px;color:#475569;font-size:.85rem">Dati salvati in questo browser. Usa Esporta backup per conservarli o trasferirli. Nessuna sincronizzazione tra PC. Le note del vecchio servizio non sono incluse.</p>
+<div class="stats-bar">
+      <div class="stat-pill"><span class="fa-solid fa-building" aria-hidden="true">▦</span><span><strong id="stat-offices">0</strong> uffici</span></div>
+      <div class="stat-pill"><span class="fa-solid fa-users" aria-hidden="true">♟</span><span><strong id="stat-employees">0</strong> dipendenti</span></div>
+      <div class="stat-pill" id="stat-results-pill" style="display:none"><span class="fa-solid fa-filter" aria-hidden="true">•</span><span><strong id="stat-results">0</strong> risultati</span></div>
+    </div>
+
+    <div id="offices-list" class="offices-list"></div>
+    <div id="empty-state" class="empty-state hidden">
+      <span class="fa-solid fa-building-circle-exclamation" aria-hidden="true">•</span>
+      <h3>Nessun ufficio presente</h3>
+      <p>Crea il primo ufficio per iniziare a gestire i contatti.</p>
+    </div>
+    <div id="search-empty-state" class="empty-state hidden">
+      <span class="fa-solid fa-magnifying-glass" aria-hidden="true">•</span>
+      <h3>Nessun risultato trovato</h3>
+      <p>Prova a modificare i criteri di ricerca.</p>
+    </div>
+
+    <!-- NOTES SECTION -->
+    <div class="notes-section" id="notes-section">
+      <div class="notes-section-header">
+        <div class="notes-section-title"><span class="fa-solid fa-note-sticky" aria-hidden="true">▤</span> Note</div>
+      </div>
+      <div class="notes-list" id="notes-list"></div>
+    </div>
+  </main>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- CONFIRM -->
+<div id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon"><span class="fa-solid fa-trash" aria-hidden="true">×</span></div>
+    <h3 id="confirm-title">Conferma eliminazione</h3>
+    <p id="confirm-msg">Sei sicuro di voler procedere?</p>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" id="confirm-cancel">Annulla</button>
+      <button class="btn btn-danger" id="confirm-ok">Elimina</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: UFFICIO -->
+<div class="modal-overlay" id="modal-office">
+  <div class="modal">
+    <h2><span class="fa-solid fa-building-user" aria-hidden="true">•</span> <span id="modal-office-title">Nuovo Ufficio</span></h2>
+    <div class="form-group">
+      <label for="office-name-input">Nome Ufficio</label>
+      <input type="text" id="office-name-input" placeholder="es. Amministrazione" />
+    </div>
+    <div class="form-group">
+      <label>Colore Accento</label>
+      <div class="color-picker-row" id="color-picker"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="modal-office-cancel">Annulla</button>
+      <button class="btn btn-primary" id="modal-office-save">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DIPENDENTE -->
+<div class="modal-overlay" id="modal-employee">
+  <div class="modal">
+    <h2><span class="fa-solid fa-user-tie" aria-hidden="true">•</span> <span id="modal-employee-title">Nuovo Dipendente</span></h2>
+    <div class="form-group">
+      <label for="emp-nome">Nome</label>
+      <input type="text" id="emp-nome" placeholder="es. Marco" />
+    </div>
+    <div class="form-group">
+      <label for="emp-cognome">Cognome</label>
+      <input type="text" id="emp-cognome" placeholder="es. Rossi" />
+    </div>
+    <div class="form-group">
+      <label for="emp-telefono">Numero di Telefono</label>
+      <input type="tel" id="emp-telefono" placeholder="es. +39 02 1234567" />
+    </div>
+    <div class="form-group">
+      <label for="emp-ufficio">Ufficio</label>
+      <select id="emp-ufficio"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="modal-emp-cancel">Annulla</button>
+      <button class="btn btn-primary" id="modal-emp-save">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NUOVA/MODIFICA NOTA -->
+<div class="modal-overlay" id="modal-note">
+  <div class="modal" style="max-width:640px">
+    <h2><span class="fa-solid fa-note-sticky" aria-hidden="true">▤</span> <span id="modal-note-title">Nuova Nota</span></h2>
+    <div class="form-group">
+      <label for="note-title-input">Titolo</label>
+      <input type="text" id="note-title-input" placeholder="Titolo della nota…" />
+    </div>
+    <div class="form-group">
+      <label>Testo</label>
+      <div class="rte-toolbar" id="rte-toolbar" role="toolbar" aria-label="Formattazione nota">
+        <select class="rte-select" id="rte-block" aria-label="Stile paragrafo"><option value="p">Testo normale</option><option value="h2">Titolo</option><option value="h3">Sottotitolo</option><option value="blockquote">Citazione</option><option value="pre">Codice</option></select>
+        <select class="rte-select" id="rte-fontsize" aria-label="Dimensione testo"><option value="2">Piccolo</option><option value="3" selected>Normale</option><option value="4">Medio</option><option value="5">Grande</option><option value="6">Molto grande</option></select>
+        <button type="button" class="rte-btn" data-cmd="undo" title="Annulla" aria-label="Annulla">↶</button>
+        <button type="button" class="rte-btn" data-cmd="redo" title="Ripeti" aria-label="Ripeti">↷</button>
+        <button type="button" class="rte-btn" data-cmd="bold" title="Grassetto" aria-label="Grassetto">G</button>
+        <button type="button" class="rte-btn" data-cmd="italic" title="Corsivo" aria-label="Corsivo">C</button>
+        <button type="button" class="rte-btn" data-cmd="underline" title="Sottolineato" aria-label="Sottolineato">S</button>
+        <button type="button" class="rte-btn" data-cmd="strikeThrough" title="Barrato" aria-label="Barrato">abc</button>
+        <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Elenco puntato" aria-label="Elenco puntato">• Lista</button>
+        <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Elenco numerato" aria-label="Elenco numerato">1. Lista</button>
+        <button type="button" class="rte-btn" data-cmd="justifyLeft" title="Allinea a sinistra" aria-label="Allinea a sinistra">Sinistra</button>
+        <button type="button" class="rte-btn" data-cmd="justifyCenter" title="Centra" aria-label="Centra">Centro</button>
+        <button type="button" class="rte-btn" data-cmd="justifyRight" title="Allinea a destra" aria-label="Allinea a destra">Destra</button>
+        <button type="button" class="rte-btn" data-cmd="justifyFull" title="Giustifica" aria-label="Giustifica">Giustifica</button>
+        <button type="button" class="rte-btn" data-cmd="outdent" title="Riduci rientro" aria-label="Riduci rientro">⇤</button>
+        <button type="button" class="rte-btn" data-cmd="indent" title="Aumenta rientro" aria-label="Aumenta rientro">⇥</button>
+        <button type="button" class="rte-btn" data-cmd="removeFormat" title="Rimuovi formattazione" aria-label="Rimuovi formattazione">Pulisci</button>
+        <label class="rte-color">Testo <input type="color" id="rte-color" value="#0f172a" aria-label="Colore testo"></label>
+        <label class="rte-color">Evidenzia <input type="color" id="rte-highlight" value="#fef08a" aria-label="Colore evidenziatore"></label>
+        <button type="button" class="rte-btn" id="rte-checklist">☐ Elenco attività</button>
+        <button type="button" class="rte-btn" id="rte-date">Data e ora</button>
+        <button type="button" class="rte-btn" id="rte-line">Linea</button>
+        <button type="button" class="rte-btn" id="rte-fullscreen" aria-pressed="false">Espandi</button>
+        <button type="button" class="rte-btn" id="rte-export">Esporta TXT</button>
+      </div>
+      <div class="rte-content" id="rte-content" contenteditable="true" role="textbox" aria-label="Testo della nota" aria-multiline="true" spellcheck="true" data-placeholder="Scrivi il testo della nota…"></div>
+    </div>
+    <p id="note-word-count" class="note-word-count">0 parole · 0 caratteri</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="modal-note-cancel">Annulla</button>
+      <button class="btn btn-primary" id="modal-note-save">Salva Nota</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+const STORAGE_KEY = 'rubrica-offline-v1';
+const SEED = {"schemaVersion": 1, "uffici": [{"id": "u-anagrafe", "nome": "Anagrafe", "colore": "#1c44cf"}, {"id": "u-stato-civile", "nome": "Stato civile", "colore": "#0c6e45"}, {"id": "u-protocollo", "nome": "Protocollo", "colore": "#875000"}, {"id": "u-segreteria", "nome": "Segreteria", "colore": "#b42318"}, {"id": "u-ragioneria", "nome": "Ragioneria", "colore": "#6b21a8"}, {"id": "u-tributi", "nome": "Tributi", "colore": "#0e7490"}, {"id": "u-ufficio-tecnico", "nome": "Ufficio tecnico", "colore": "#be185d"}, {"id": "u-edilizia-privata", "nome": "Edilizia privata", "colore": "#4d7c0f"}, {"id": "u-lavori-pubblici", "nome": "Lavori pubblici", "colore": "#1e3a8a"}, {"id": "u-polizia-locale", "nome": "Polizia locale", "colore": "#9a3412"}, {"id": "u-servizi-sociali", "nome": "Servizi sociali", "colore": "#374151"}, {"id": "u-istruzione", "nome": "Istruzione", "colore": "#0f766e"}, {"id": "u-biblioteca", "nome": "Biblioteca", "colore": "#a16207"}, {"id": "u-commercio", "nome": "Commercio", "colore": "#7c2d12"}, {"id": "u-ced", "nome": "CED", "colore": "#155e75"}, {"id": "u-messi-comunali", "nome": "Messi comunali", "colore": "#3f6212"}], "dipendenti": [{"id": "d-001", "nome": "Caterina", "cognome": "Monti", "telefono": "", "telefonoPrivato": false, "ufficioId": "u-anagrafe"}, {"id": "d-002", "nome": "Alberto", "cognome": "Bruno", "telefono": "", "telefonoPrivato": false, "ufficioId": "u-anagrafe"}, {"id": "d-003", "nome": "Sara", "cognome": "Gallo", "telefono": "203 / 204", "telefonoPrivato": false, "ufficioId": "u-anagrafe"}, {"id": "d-004", "nome": "Rosa", "cognome": "Moretti", "telefono": "204", "telefonoPrivato": false, "ufficioId": "u-anagrafe"}, {"id": "d-005", "nome": "Battista", "cognome": "Monti", "telefono": "205", "telefonoPrivato": false, "ufficioId": "u-anagrafe"}, {"id": "d-006", "nome": "Ermanno", "cognome": "Mariani", "telefono": "207", "telefonoPrivato": false, "ufficioId": "u-stato-civile"}, {"id": "d-007", "nome": "Battista", "cognome": "Marini", "telefono": "208 / 209", "telefonoPrivato": false, "ufficioId": "u-stato-civile"}, {"id": "d-008", "nome": "Alberto", "cognome": "Costa", "telefono": "209", "telefonoPrivato": false, "ufficioId": "u-protocollo"}, {"id": "d-009", "nome": "Gian Luca", "cognome": "Bonetti", "telefono": "212", "telefonoPrivato": false, "ufficioId": "u-protocollo"}, {"id": "d-010", "nome": "Bice", "cognome": "Pellegrino", "telefono": "214", "telefonoPrivato": false, "ufficioId": "u-protocollo"}, {"id": "d-011", "nome": "Michele", "cognome": "De Luca", "telefono": "216", "telefonoPrivato": false, "ufficioId": "u-segreteria"}, {"id": "d-012", "nome": "Federica", "cognome": "Ferraro", "telefono": "217 / 218", "telefonoPrivato": false, "ufficioId": "u-segreteria"}, {"id": "d-013", "nome": "Francesca", "cognome": "Sala", "telefono": "218", "telefonoPrivato": false, "ufficioId": "u-segreteria"}, {"id": "d-014", "nome": "Giuseppina", "cognome": "Conti", "telefono": "220", "telefonoPrivato": false, "ufficioId": "u-segreteria"}, {"id": "d-015", "nome": "Wilma", "cognome": "Dell'Acqua", "telefono": "", "telefonoPrivato": false, "ufficioId": "u-ragioneria"}, {"id": "d-016", "nome": "Aldo", "cognome": "Giuliani", "telefono": "", "telefonoPrivato": false, "ufficioId": "u-ragioneria"}, {"id": "d-017", "nome": "Agnese", "cognome": "Grassi", "telefono": "226", "telefonoPrivato": false, "ufficioId": "u-ragioneria"}, {"id": "d-018", "nome": "Anna", "cognome": "Carbone", "telefono": "000 219 9088", "telefonoPrivato": true, "ufficioId": "u-ragioneria"}, {"id": "d-019", "nome": "Bruno", "cognome": "Ferraro", "telefono": "229", "telefonoPrivato": false, "ufficioId": "u-tributi"}, {"id": "d-020", "nome": "Chiara", "cognome": "Dell'Acqua", "telefono": "000 511 5552", "telefonoPrivato": true, "ufficioId": "u-tributi"}, {"id": "d-021", "nome": "Roberto", "cognome": "Zani", "telefono": "232", "telefonoPrivato": false, "ufficioId": "u-tributi"}, {"id": "d-022", "nome": "Laura", "cognome": "Coppola", "telefono": "233 / 234", "telefonoPrivato": false, "ufficioId": "u-tributi"}, {"id": "d-023", "nome": "Paolo", "cognome": "Coppola", "telefono": "234", "telefonoPrivato": false, "ufficioId": "u-ufficio-tecnico"}, {"id": "d-024", "nome": "Giorgio", "cognome": "Ferraro", "telefono": "235 / 236", "telefonoPrivato": false, "ufficioId": "u-ufficio-tecnico"}, {"id": "d-025", "nome": "Noemi", "cognome": "Grasso", "telefono": "236", "telefonoPrivato": false, "ufficioId": "u-ufficio-tecnico"}, {"id": "d-026", "nome": "Matteo", "cognome": "Monti", "telefono": "239", "telefonoPrivato": false, "ufficioId": "u-edilizia-privata"}, {"id": "d-027", "nome": "Niccolò", "cognome": "Cattaneo", "telefono": "000 313 8219", "telefonoPrivato": true, "ufficioId": "u-edilizia-privata"}, {"id": "d-028", "nome": "Vincenzo", "cognome": "Sala", "telefono": "241 / 242", "telefonoPrivato": false, "ufficioId": "u-lavori-pubblici"}, {"id": "d-029", "nome": "Ottavio", "cognome": "Costa", "telefono": "243", "telefonoPrivato": false, "ufficioId": "u-lavori-pubblici"}, {"id": "d-030", "nome": "Bruno", "cognome": "Farina", "telefono": "244", "telefonoPrivato": false, "ufficioId": "u-lavori-pubblici"}, {"id": "d-031", "nome": "Wilma", "cognome": "Palumbo", "telefono": "247 / 248", "telefonoPrivato": false, "ufficioId": "u-polizia-locale"}, {"id": "d-032", "nome": "Marta", "cognome": "Benedetti", "telefono": "250", "telefonoPrivato": false, "ufficioId": "u-polizia-locale"}, {"id": "d-033", "nome": "Angelo", "cognome": "Sala", "telefono": "252", "telefonoPrivato": false, "ufficioId": "u-polizia-locale"}, {"id": "d-034", "nome": "Ettore", "cognome": "Romano", "telefono": "253", "telefonoPrivato": false, "ufficioId": "u-polizia-locale"}, {"id": "d-035", "nome": "Caterina", "cognome": "Tonoli", "telefono": "254", "telefonoPrivato": false, "ufficioId": "u-polizia-locale"}, {"id": "d-036", "nome": "Giovanna", "cognome": "Parisi", "telefono": "256", "telefonoPrivato": false, "ufficioId": "u-polizia-locale"}, {"id": "d-037", "nome": "Concetta", "cognome": "Bonetti", "telefono": "258", "telefonoPrivato": false, "ufficioId": "u-servizi-sociali"}, {"id": "d-038", "nome": "Michele", "cognome": "Cattaneo", "telefono": "000 604 6825", "telefonoPrivato": true, "ufficioId": "u-servizi-sociali"}, {"id": "d-039", "nome": "Giovanni", "cognome": "Conte", "telefono": "262", "telefonoPrivato": false, "ufficioId": "u-servizi-sociali"}, {"id": "d-040", "nome": "Federica", "cognome": "De Angelis", "telefono": "264 / 265", "telefonoPrivato": false, "ufficioId": "u-servizi-sociali"}, {"id": "d-041", "nome": "Paolo", "cognome": "Giuliani", "telefono": "265", "telefonoPrivato": false, "ufficioId": "u-istruzione"}, {"id": "d-042", "nome": "Noemi", "cognome": "Rossi", "telefono": "268", "telefonoPrivato": false, "ufficioId": "u-istruzione"}, {"id": "d-043", "nome": "Giovanna", "cognome": "Moretti", "telefono": "271", "telefonoPrivato": false, "ufficioId": "u-biblioteca"}, {"id": "d-044", "nome": "Niccolò", "cognome": "Martini", "telefono": "274", "telefonoPrivato": false, "ufficioId": "u-biblioteca"}, {"id": "d-045", "nome": "Giovanna", "cognome": "Monti", "telefono": "277", "telefonoPrivato": false, "ufficioId": "u-commercio"}, {"id": "d-046", "nome": "Carlo", "cognome": "Galli", "telefono": "", "telefonoPrivato": false, "ufficioId": "u-ced"}, {"id": "d-047", "nome": "Caterina", "cognome": "Giuliani", "telefono": "280 / 281", "telefonoPrivato": false, "ufficioId": "u-ced"}, {"id": "d-901", "nome": "Maria", "cognome": "Rossi", "telefono": "251", "telefonoPrivato": false, "ufficioId": "u-anagrafe"}, {"id": "d-902", "nome": "Maria", "cognome": "Rossi", "telefono": "318", "telefonoPrivato": false, "ufficioId": "u-tributi"}, {"id": "d-903", "nome": "Anna Maria Immacolata", "cognome": "Dell'Acqua Ferraresi", "telefono": "277", "telefonoPrivato": false, "ufficioId": "u-servizi-sociali"}], "note": [{"id": "n-001", "titolo": "Turni dello sportello", "privata": false, "createdAt": "2026-11-08T09:30:00Z", "testo": "<p><b>Sportello anagrafe</b></p><ul><li>Lunedì e mercoledì: mattina</li><li>Giovedì: pomeriggio su appuntamento</li></ul><p>Esempio di nota con elenco puntato.</p>"}, {"id": "n-002", "titolo": "Numeri utili (di esempio)", "privata": false, "createdAt": "2026-11-15T09:30:00Z", "testo": "<p>Assistenza stampanti: <b>000 0000000</b></p><p>Centralino: <b>000 0000000</b></p><p><i>Tutti i numeri di questa rubrica sono inventati.</i></p>"}, {"id": "n-003", "titolo": "Da fare questa settimana", "privata": false, "createdAt": "2026-11-19T09:30:00Z", "testo": "<p>☑ Aggiornare gli interni della Polizia locale</p><p>☐ Inserire il nuovo collega del CED</p><p>☐ Esportare il backup della rubrica</p>"}]};
+const db = {};
+let localData, storageIssue = '';
+try {
+ const raw = localStorage.getItem(STORAGE_KEY);
+ localData = raw ? validateData(JSON.parse(raw)) : structuredClone(SEED);
+ if (!raw) localStorage.setItem(STORAGE_KEY, JSON.stringify(localData));
+} catch (e) {
+ localData = structuredClone(SEED);
+ storageIssue = 'Salvataggio locale non disponibile o dati non leggibili. Esporta un backup; nessun dato esistente viene sovrascritto.';
+}
+function cleanNote(html) {
+ const t = document.createElement('template'); t.innerHTML = html;
+ const allowed = new Set(['B','STRONG','I','EM','U','S','BR','P','DIV','SPAN','UL','OL','LI','FONT','H2','H3','BLOCKQUOTE','PRE','HR']);
+ function clean(parent) {
+  for (const e of [...parent.children]) {
+   if (!allowed.has(e.tagName)) { e.replaceWith(document.createTextNode(e.textContent)); continue; }
+   const keep={};
+   if(e.tagName==='FONT') {
+    if(/^[1-7]$/.test(e.getAttribute('size')||'')) keep.size=e.getAttribute('size');
+    if(/^#[0-9a-f]{6}$/i.test(e.getAttribute('color')||'')) keep.color=e.getAttribute('color');
+   }
+   const style=e.style;
+   const safe=[];
+   for(const property of ['color','background-color','font-size','font-weight','font-style','text-decoration','text-align','margin-left']) {
+    const value=style.getPropertyValue(property);
+    if(value && /^[#a-zA-Z0-9(),.%\s-]+$/.test(value) && !/url|var|expression/i.test(value)) safe.push(property+':'+value);
+   }
+   for (const a of [...e.attributes]) e.removeAttribute(a.name);
+   for(const [key,value] of Object.entries(keep)) e.setAttribute(key,value);
+   if(safe.length) e.setAttribute('style',safe.join(';'));
+   clean(e);
+  }
+ }
+ clean(t.content); return t.innerHTML;
+}
+function validateData(d) {
+ if (!d || d.schemaVersion !== 1) throw Error('Formato backup non riconosciuto');
+ for (const k of ['uffici','dipendenti','note']) {
+  if (!Array.isArray(d[k]) || d[k].length > 10000) throw Error('Elenco non valido: '+k);
+  const ids = new Set();
+  for (const r of d[k]) {
+   if (!r || typeof r.id !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(r.id) || ids.has(r.id)) throw Error('Identificativo non valido');
+   ids.add(r.id);
+   const fields = k === 'uffici' ? ['nome'] : k === 'dipendenti' ? ['nome','cognome','telefono','ufficioId'] : ['titolo','testo'];
+   for (const f of fields) if (typeof r[f] !== 'string' || r[f].length > 100000) throw Error('Campo non valido: '+f);
+   if(k==='uffici' && !/^#[0-9a-f]{6}$/i.test(r.colore)) throw Error('Colore non valido');
+   if(k==='note') r.testo=cleanNote(r.testo);
+  }
+ }
+ const ids=new Set(d.uffici.map(o=>o.id));
+ if(d.dipendenti.some(e=>!ids.has(e.ufficioId))) throw Error('Ufficio mancante');
+ return d;
+}
+function syncLocal() {
+ offices = localData.uffici.slice().sort((a,b)=>a.nome.localeCompare(b.nome,'it'));
+ employees = localData.dipendenti.slice().sort((a,b)=>a.cognome.localeCompare(b.cognome,'it'));
+ notes = localData.note.slice();
+ renderAll(); renderNotes();
+}
+function commit(next) {
+ if(storageIssue) throw Error(storageIssue);
+ validateData(next);
+ localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+ localData=next; syncLocal();
+}
+function collection(_db, key) { return {key}; }
+function doc(_db, key, id) { return {key,id}; }
+function serverTimestamp() { return new Date().toISOString(); }
+async function addDoc(ref, data) {
+ const next=structuredClone(localData), id='r-'+crypto.randomUUID();
+ next[ref.key].push({...data,id}); commit(next); return {id};
+}
+async function updateDoc(ref, data) {
+ const next=structuredClone(localData), row=next[ref.key].find(r=>r.id===ref.id);
+ if(!row) throw Error('Voce non trovata');
+ Object.assign(row,data); commit(next);
+}
+async function deleteDoc(ref) {
+ const next=structuredClone(localData);
+ next[ref.key]=next[ref.key].filter(r=>r.id!==ref.id);
+ if(ref.key==='uffici') next.dipendenti=next.dipendenti.filter(e=>e.ufficioId!==ref.id);
+ commit(next);
+}
+
+// =============================================
+//  STATE
+// =============================================
+let offices   = [];
+let employees = [];
+let notes     = [];
+let searchTerm = '';
+
+const COLORS = [
+  { value: '#2563eb', label: 'Blu' },
+  { value: '#0891b2', label: 'Azzurro' },
+  { value: '#059669', label: 'Verde' },
+  { value: '#7c3aed', label: 'Viola' },
+  { value: '#e11d48', label: 'Rosso' },
+  { value: '#ea580c', label: 'Arancione' },
+  { value: '#4338ca', label: 'Indaco' },
+  { value: '#0e7490', label: 'Ciano' },
+];
+
+let selectedColor = COLORS[0].value;
+let editingOfficeId = null, editingEmployeeId = null, editingNoteId = null;
+let openOffices = new Set();
+let openNotes   = new Set();
+
+// =============================================
+//  DOM
+// =============================================
+const loadingOverlay  = document.getElementById('loading-overlay');
+const appEl           = document.getElementById('app');
+const searchInput     = document.getElementById('search-input');
+const clearSearchBtn  = document.getElementById('clear-search');
+const officesListEl   = document.getElementById('offices-list');
+const notesListEl     = document.getElementById('notes-list');
+const emptyState      = document.getElementById('empty-state');
+const searchEmptyState= document.getElementById('search-empty-state');
+const statOffices     = document.getElementById('stat-offices');
+const statEmployees   = document.getElementById('stat-employees');
+const statResults     = document.getElementById('stat-results');
+const statResultsPill = document.getElementById('stat-results-pill');
+
+const modalOffice       = document.getElementById('modal-office');
+const officeNameInput   = document.getElementById('office-name-input');
+const colorPickerEl     = document.getElementById('color-picker');
+const modalOfficeTitle  = document.getElementById('modal-office-title');
+const modalOfficeSave   = document.getElementById('modal-office-save');
+const modalOfficeCancel = document.getElementById('modal-office-cancel');
+
+const modalEmployee   = document.getElementById('modal-employee');
+const empNome         = document.getElementById('emp-nome');
+const empCognome      = document.getElementById('emp-cognome');
+const empTelefono     = document.getElementById('emp-telefono');
+const empUfficio      = document.getElementById('emp-ufficio');
+const modalEmpTitle   = document.getElementById('modal-employee-title');
+const modalEmpSave    = document.getElementById('modal-emp-save');
+const modalEmpCancel  = document.getElementById('modal-emp-cancel');
+
+const modalNote       = document.getElementById('modal-note');
+const modalNoteTitle  = document.getElementById('modal-note-title');
+const noteTitleInput  = document.getElementById('note-title-input');
+const rteContent      = document.getElementById('rte-content');
+const modalNoteCancel = document.getElementById('modal-note-cancel');
+const modalNoteSave   = document.getElementById('modal-note-save');
+
+const confirmOverlay   = document.getElementById('confirm-overlay');
+const confirmTitle     = document.getElementById('confirm-title');
+const confirmMsg       = document.getElementById('confirm-msg');
+const confirmOkBtn     = document.getElementById('confirm-ok');
+const confirmCancelBtn = document.getElementById('confirm-cancel');
+
+// =============================================
+//  AVVIO LOCALE
+// =============================================
+function initializeLocalApp() {
+ loadingOverlay.classList.add('hidden');
+ appEl.classList.remove('hidden');
+ syncLocal();
+ if(storageIssue) document.getElementById('local-status').textContent=storageIssue;
+}
+// =============================================
+//  RENDER OFFICES
+// =============================================
+function renderAll() {
+  renderOfficeNavigation();
+  const q = searchTerm.toLowerCase().trim();
+  statOffices.textContent   = offices.length;
+  statEmployees.textContent = employees.length;
+
+  if (offices.length === 0) {
+    officesListEl.innerHTML = '';
+    emptyState.classList.remove('hidden');
+    searchEmptyState.classList.add('hidden');
+    statResultsPill.style.display = 'none';
+    return;
+  }
+  emptyState.classList.add('hidden');
+
+  const hl = t => {
+    if (!q) return escHtml(t);
+    return escHtml(t).replace(new RegExp(`(${escRegex(q)})`, 'gi'), '<mark class="highlight">$1</mark>');
+  };
+
+  let totalResults = 0, matchedOfficeCount = 0;
+
+  const officeItems = offices.map(office => {
+    const allEmps = employees.filter(e => e.ufficioId === office.id);
+    const officeMatches = q && (office.nome || '').toLowerCase().includes(q);
+    let matchedEmps = [], displayEmps;
+
+    if (q) {
+      matchedEmps = allEmps.filter(e =>
+        (e.nome||'').toLowerCase().includes(q) ||
+        (e.cognome||'').toLowerCase().includes(q) ||
+        (e.telefono||'').toLowerCase().includes(q)
+      );
+      if (officeMatches) {
+        const ids = new Set(matchedEmps.map(e => e.id));
+        displayEmps = [...matchedEmps, ...allEmps.filter(e => !ids.has(e.id))];
+      } else {
+        displayEmps = matchedEmps;
+      }
+    } else {
+      displayEmps = allEmps;
+    }
+
+    const visible = !q || officeMatches || matchedEmps.length > 0;
+    if (!visible) return null;
+
+    if (q) {
+      if (officeMatches) matchedOfficeCount++;
+      totalResults += officeMatches ? allEmps.length : matchedEmps.length;
+    }
+
+    return { office, displayEmps, officeMatches, matchedEmps, sortScore: officeMatches ? 2 : (matchedEmps.length > 0 ? 1 : 0) };
+  }).filter(Boolean);
+
+  if (q) officeItems.sort((a, b) => b.sortScore - a.sortScore);
+
+  const html = officeItems.map(({ office, displayEmps, officeMatches, matchedEmps }) => {
+    const isOpen = openOffices.has(office.id) || (q && (officeMatches || matchedEmps.length > 0));
+    const color = office.colore || '#2563eb';
+    const bg    = hexToRgba(color, 0.1);
+    const totalEmpsInOffice = employees.filter(e => e.ufficioId === office.id).length;
+    const officeNameHtml = officeMatches ? hl(office.nome) : escHtml(office.nome);
+    const matchStyle = officeMatches ? `style="box-shadow: 0 0 0 2px ${color};"` : '';
+
+    const empsHtml = displayEmps.length > 0
+      ? displayEmps.map(e => renderEmployee(e, color, q, matchedEmps.some(m => m.id === e.id))).join('')
+      : `<div class="no-employees"><span class="fa-solid fa-user-slash" aria-hidden="true">•</span>Nessun dipendente${q && !officeMatches ? ' trovato' : ''}</div>`;
+
+    const editActions = true ? `
+      <div class="office-actions" onclick="event.stopPropagation()">
+        <button class="btn-icon" title="Modifica ufficio" data-edit-office="${office.id}"><span class="fa-solid fa-pen" aria-hidden="true">✎</span></button>
+        <button class="btn-icon danger" title="Elimina ufficio" data-delete-office="${office.id}"><span class="fa-solid fa-trash" aria-hidden="true">×</span></button>
+      </div>` : '';
+
+    const addEmpBtn = true ? `
+      <button class="btn btn-secondary" style="font-size:.75rem;padding:5px 12px" data-add-emp-to="${office.id}">
+        <span class="fa-solid fa-user-plus" aria-hidden="true">+</span> Aggiungi
+      </button>` : '';
+
+    return `
+      <div class="office-card ${isOpen ? 'open' : ''}" data-office-id="${office.id}" ${matchStyle}>
+        <div class="office-header" data-toggle="${office.id}">
+          <div class="office-color-bar" style="background:${color}"></div>
+          <div class="office-icon" style="background:${bg};color:${color}"><span class="fa-solid fa-building" aria-hidden="true">▦</span></div>
+          <div class="office-name">
+            <h2>${officeNameHtml}</h2>
+            <div class="office-count">${totalEmpsInOffice} dipendent${totalEmpsInOffice===1?'e':'i'}</div>
+          </div>
+          <span class="office-badge" style="background:${bg};color:${color}">${abbr(office.nome)}</span>
+          ${editActions}
+          <span class="fa-solid fa-chevron-down office-chevron" aria-hidden="true">⌄</span>
+        </div>
+        <div class="office-body">
+          <div class="office-body-inner">
+            <div class="employees-header">
+              <span>Dipendenti</span>
+              ${addEmpBtn}
+            </div>
+            <div class="employees-grid">${empsHtml}</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  officesListEl.innerHTML = html;
+
+  if (q && officeItems.length === 0) searchEmptyState.classList.remove('hidden');
+  else searchEmptyState.classList.add('hidden');
+
+  if (q) {
+    statResultsPill.style.display = 'flex';
+    statResults.textContent = officeItems.length > 0
+      ? (matchedOfficeCount > 0 ? `${matchedOfficeCount} uffici + ${totalResults} dip.` : `${totalResults}`)
+      : '0';
+  } else {
+    statResultsPill.style.display = 'none';
+  }
+
+  attachOfficeEvents();
+}
+
+function renderEmployee(e, color, q, isMatched = true) {
+  const fullName = `${e.nome||''} ${e.cognome||''}`.trim();
+  const initials = `${(e.nome||'?')[0]}${(e.cognome||'?')[0]}`.toUpperCase();
+  const hl = t => (!q || !isMatched) ? escHtml(t) : escHtml(t).replace(new RegExp(`(${escRegex(q)})`, 'gi'), '<mark class="highlight">$1</mark>');
+
+  let phoneHtml;
+  phoneHtml = `<a href="tel:${escHtml(e.telefono||'')}">${hl(e.telefono||'—')}</a>`;
+
+  const editActions = true ? `
+    <div class="emp-actions">
+      <button class="btn-icon" title="Modifica" data-edit-emp="${e.id}"><span class="fa-solid fa-pen" aria-hidden="true">✎</span></button>
+      <button class="btn-icon danger" title="Elimina" data-delete-emp="${e.id}"><span class="fa-solid fa-trash" aria-hidden="true">×</span></button>
+    </div>` : '';
+
+  return `
+    <div class="employee-card" data-emp-id="${e.id}">
+      <div class="emp-avatar" style="background:${color}">${initials}</div>
+      <div class="emp-info">
+        <div class="emp-name">${hl(fullName)}</div>
+        <div class="emp-phone"><span class="fa-solid fa-phone" aria-hidden="true">☎</span>${phoneHtml}</div>
+      </div>
+      ${editActions}
+    </div>`;
+}
+
+function attachOfficeEvents() {
+  document.querySelectorAll('[data-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.toggle;
+      const card = document.querySelector(`.office-card[data-office-id="${id}"]`);
+      if (openOffices.has(id)) { openOffices.delete(id); card.classList.remove('open'); }
+      else { openOffices.add(id); card.classList.add('open'); }
+    });
+  });
+
+
+  document.querySelectorAll('[data-edit-office]').forEach(btn => btn.addEventListener('click', () => openEditOffice(btn.dataset.editOffice)));
+
+  document.querySelectorAll('[data-delete-office]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.deleteOffice;
+      const off = offices.find(o => o.id === id);
+      const count = employees.filter(e => e.ufficioId === id).length;
+      const msg = count > 0
+        ? `Eliminando "${off?.nome}" verranno eliminati anche ${count} dipendenti.`
+        : `Stai per eliminare l'ufficio "${off?.nome}".`;
+      showConfirm('Elimina Ufficio', msg, async () => {
+        try {
+          await Promise.all(employees.filter(e => e.ufficioId === id).map(e => deleteDoc(doc(db, 'dipendenti', e.id))));
+          await deleteDoc(doc(db, 'uffici', id));
+          openOffices.delete(id);
+          showToast('Ufficio eliminato', 'success');
+        } catch { showToast('Errore eliminazione', 'error'); }
+      });
+    });
+  });
+
+  document.querySelectorAll('[data-add-emp-to]').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); openAddEmployee(btn.dataset.addEmpTo); });
+  });
+
+  document.querySelectorAll('[data-edit-emp]').forEach(btn => btn.addEventListener('click', () => openEditEmployee(btn.dataset.editEmp)));
+
+  document.querySelectorAll('[data-delete-emp]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.deleteEmp;
+      const emp = employees.find(e => e.id === id);
+      showConfirm('Elimina Dipendente', `Stai per eliminare "${emp?.nome} ${emp?.cognome}".`, async () => {
+        try { await deleteDoc(doc(db, 'dipendenti', id)); showToast('Dipendente eliminato', 'success'); }
+        catch { showToast('Errore eliminazione', 'error'); }
+      });
+    });
+  });
+}
+
+// =============================================
+//  RENDER NOTES
+// =============================================
+function renderNotes() {
+  renderOfficeNavigation();
+  const visibleNotes = notes;
+
+  if (visibleNotes.length === 0) {
+    notesListEl.innerHTML = `
+      <div class="notes-empty-state">
+        <span class="fa-solid fa-note-sticky" aria-hidden="true">▤</span>
+        <p>${'Nessuna nota. Premi + Nota per crearne una.'}</p>
+      </div>`;
+    return;
+  }
+
+  notesListEl.innerHTML = visibleNotes.map(note => {
+    const isOpen = openNotes.has(note.id);
+    const privBadge = '';
+    const date = note.createdAt ? new Date(note.createdAt).toLocaleDateString('it-IT') : '';
+
+    const editActions = true ? `
+      <div class="note-card-actions" onclick="event.stopPropagation()">
+        <button class="btn-icon" title="Modifica nota" data-edit-note="${note.id}"><span class="fa-solid fa-pen" aria-hidden="true">✎</span></button>
+        <button class="btn-icon danger" title="Elimina nota" data-delete-note="${note.id}"><span class="fa-solid fa-trash" aria-hidden="true">×</span></button>
+      </div>` : '';
+
+    return `
+      <div class="note-card ${isOpen ? 'open' : ''}" data-note-id="${note.id}">
+        <div class="note-card-header" data-toggle-note="${note.id}">
+          <div class="note-card-icon"><span class="fa-solid fa-note-sticky" aria-hidden="true">▤</span></div>
+          <div class="note-card-title">${escHtml(note.titolo || 'Senza titolo')}${privBadge}</div>
+          <div class="note-card-meta">${date}</div>
+          ${editActions}
+          <span class="fa-solid fa-chevron-down note-card-chevron" aria-hidden="true">⌄</span>
+        </div>
+        <div class="note-card-body">
+          <div class="note-card-content">${cleanNote(note.testo || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  attachNoteEvents();
+}
+
+function attachNoteEvents() {
+  document.querySelectorAll('[data-toggle-note]').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.toggleNote;
+      const card = document.querySelector(`.note-card[data-note-id="${id}"]`);
+      if (openNotes.has(id)) { openNotes.delete(id); card.classList.remove('open'); }
+      else { openNotes.add(id); card.classList.add('open'); }
+    });
+  });
+
+
+  document.querySelectorAll('[data-edit-note]').forEach(btn => btn.addEventListener('click', () => openEditNote(btn.dataset.editNote)));
+
+  document.querySelectorAll('[data-delete-note]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.deleteNote;
+      const note = notes.find(n => n.id === id);
+      showConfirm('Elimina Nota', `Stai per eliminare la nota "${note?.titolo}".`, async () => {
+        try { await deleteDoc(doc(db, 'note', id)); openNotes.delete(id); showToast('Nota eliminata', 'success'); }
+        catch { showToast('Errore eliminazione', 'error'); }
+      });
+    });
+  });
+}
+
+// =============================================
+//  SEARCH
+// =============================================
+searchInput.addEventListener('input', () => {
+  searchTerm = searchInput.value;
+  clearSearchBtn.classList.toggle('hidden', !searchTerm);
+  renderAll();
+});
+clearSearchBtn.addEventListener('click', () => {
+  searchInput.value = ''; searchTerm = '';
+  clearSearchBtn.classList.add('hidden');
+  renderAll(); searchInput.focus();
+});
+
+// =============================================
+//  COLOR PICKER
+// =============================================
+function buildColorPicker(selected) {
+  colorPickerEl.innerHTML = COLORS.map(c => `
+    <button class="color-swatch ${c.value===selected?'selected':''}" style="background:${c.value}" data-color="${c.value}" title="${c.label}" type="button"></button>
+  `).join('');
+  colorPickerEl.querySelectorAll('.color-swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      colorPickerEl.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+      selectedColor = sw.dataset.color;
+    });
+  });
+}
+
+// =============================================
+//  OFFICE MODAL
+// =============================================
+document.getElementById('btn-add-office').addEventListener('click', openAddOffice);
+function openAddOffice() {
+  editingOfficeId = null;
+  modalOfficeTitle.textContent = 'Nuovo Ufficio';
+  officeNameInput.value = '';
+  selectedColor = COLORS[0].value;
+  buildColorPicker(selectedColor);
+  openModal(modalOffice);
+  setTimeout(() => officeNameInput.focus(), 200);
+}
+function openEditOffice(id) {
+  const off = offices.find(o => o.id === id);
+  if (!off) return;
+  editingOfficeId = id;
+  modalOfficeTitle.textContent = 'Modifica Ufficio';
+  officeNameInput.value = off.nome;
+  selectedColor = off.colore || COLORS[0].value;
+  buildColorPicker(selectedColor);
+  openModal(modalOffice);
+  setTimeout(() => officeNameInput.focus(), 200);
+}
+modalOfficeSave.addEventListener('click', async () => {
+  const nome = officeNameInput.value.trim();
+  if (!nome) { officeNameInput.focus(); showToast('Inserisci il nome dell\'ufficio', 'warning'); return; }
+  try {
+    const data = { nome, colore: selectedColor };
+    if (editingOfficeId) { await updateDoc(doc(db, 'uffici', editingOfficeId), data); showToast('Ufficio aggiornato', 'success'); }
+    else { await addDoc(collection(db, 'uffici'), data); showToast('Ufficio aggiunto', 'success'); }
+    closeModal(modalOffice);
+  } catch { showToast('Errore salvataggio', 'error'); }
+});
+modalOfficeCancel.addEventListener('click', () => closeModal(modalOffice));
+officeNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') modalOfficeSave.click(); });
+
+// =============================================
+//  EMPLOYEE MODAL
+// =============================================
+document.getElementById('btn-add-employee').addEventListener('click', () => openAddEmployee());
+function populateUfficioSelect(preselect) {
+  empUfficio.innerHTML = offices.length
+    ? offices.map(o => `<option value="${o.id}" ${o.id===preselect?'selected':''}>${escHtml(o.nome)}</option>`).join('')
+    : '<option value="">— Nessun ufficio —</option>';
+}
+function openAddEmployee(preUfficioId) {
+  editingEmployeeId = null;
+  modalEmpTitle.textContent = 'Nuovo Dipendente';
+  empNome.value = ''; empCognome.value = ''; empTelefono.value = '';
+  populateUfficioSelect(preUfficioId);
+  openModal(modalEmployee);
+  setTimeout(() => empNome.focus(), 200);
+}
+function openEditEmployee(id) {
+  const emp = employees.find(e => e.id === id);
+  if (!emp) return;
+  editingEmployeeId = id;
+  modalEmpTitle.textContent = 'Modifica Dipendente';
+  empNome.value = emp.nome||''; empCognome.value = emp.cognome||''; empTelefono.value = emp.telefono||'';
+  populateUfficioSelect(emp.ufficioId);
+  openModal(modalEmployee);
+  setTimeout(() => empNome.focus(), 200);
+}
+modalEmpSave.addEventListener('click', async () => {
+  const nome = empNome.value.trim(), cognome = empCognome.value.trim(), telefono = empTelefono.value.trim(), ufficioId = empUfficio.value;
+  if (!nome)     { empNome.focus();     showToast('Inserisci il nome', 'warning');     return; }
+  if (!cognome)  { empCognome.focus();  showToast('Inserisci il cognome', 'warning');  return; }
+  if (!telefono) { empTelefono.focus(); showToast('Inserisci il numero', 'warning');   return; }
+  if (!ufficioId){ showToast('Seleziona un ufficio', 'warning'); return; }
+  const data = { nome, cognome, telefono, telefonoPrivato: false, ufficioId };
+  try {
+    if (editingEmployeeId) { await updateDoc(doc(db, 'dipendenti', editingEmployeeId), data); showToast('Dipendente aggiornato', 'success'); }
+    else { await addDoc(collection(db, 'dipendenti'), data); showToast('Dipendente aggiunto', 'success'); }
+    openOffices.add(ufficioId);
+    closeModal(modalEmployee);
+  } catch { showToast('Errore salvataggio', 'error'); }
+});
+modalEmpCancel.addEventListener('click', () => closeModal(modalEmployee));
+
+// =============================================
+//  NOTE MODAL + RTE
+// =============================================
+document.getElementById('btn-new-note').addEventListener('click', openNewNote);
+
+function openNewNote() {
+  editingNoteId = null;
+  modalNoteTitle.textContent = 'Nuova Nota';
+  noteTitleInput.value = '';
+  rteContent.innerHTML = '';
+  openModal(modalNote);
+  setTimeout(() => noteTitleInput.focus(), 200);
+}
+
+function openEditNote(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  editingNoteId = id;
+  modalNoteTitle.textContent = 'Modifica Nota';
+  noteTitleInput.value = note.titolo || '';
+  rteContent.innerHTML = cleanNote(note.testo || '');
+  openModal(modalNote);
+  setTimeout(() => noteTitleInput.focus(), 200);
+}
+
+modalNoteSave.addEventListener('click', async () => {
+  const titolo = noteTitleInput.value.trim();
+  if (!titolo) { noteTitleInput.focus(); showToast('Inserisci il titolo della nota', 'warning'); return; }
+  const testo = cleanNote(rteContent.innerHTML.trim());
+  try {
+    if (editingNoteId) {
+      await updateDoc(doc(db, 'note', editingNoteId), { titolo, testo, privata: false });
+      showToast('Nota aggiornata', 'success');
+    } else {
+      await addDoc(collection(db, 'note'), { titolo, testo, privata: false, createdAt: serverTimestamp() });
+      showToast('Nota salvata', 'success');
+    }
+    closeModal(modalNote);
+  } catch { showToast('Errore salvataggio nota', 'error'); }
+});
+modalNoteCancel.addEventListener('click', () => closeModal(modalNote));
+
+
+// Rich text editing; selections are preserved when using toolbar controls.
+let noteSelection=null;
+function rememberNoteSelection() {
+ const selection=window.getSelection();
+ if(selection.rangeCount && rteContent.contains(selection.anchorNode)) noteSelection=selection.getRangeAt(0).cloneRange();
+}
+function noteCommand(cmd,value=null) {
+ rteContent.focus();
+ const selection=window.getSelection();
+ if(noteSelection && rteContent.contains(noteSelection.startContainer)) {
+  selection.removeAllRanges(); selection.addRange(noteSelection);
+ }
+ document.execCommand(cmd,false,value); rememberNoteSelection(); updateRteToolbar(); updateNoteCount();
+}
+document.addEventListener('selectionchange',rememberNoteSelection);
+document.querySelectorAll('.rte-btn[data-cmd]').forEach(btn=>{
+ btn.addEventListener('mousedown',e=>e.preventDefault());
+ btn.addEventListener('click',()=>noteCommand(btn.dataset.cmd));
+});
+document.getElementById('rte-fontsize').onchange=e=>noteCommand('fontSize',e.target.value);
+document.getElementById('rte-block').onchange=e=>noteCommand('formatBlock',e.target.value);
+document.getElementById('rte-color').oninput=e=>noteCommand('foreColor',e.target.value);
+document.getElementById('rte-highlight').oninput=e=>noteCommand('hiliteColor',e.target.value);
+for(const id of ['rte-checklist','rte-date','rte-line']) document.getElementById(id).addEventListener('mousedown',e=>e.preventDefault());
+document.getElementById('rte-checklist').onclick=()=>noteCommand('insertHTML','<ul><li>☐ Attività</li></ul>');
+document.getElementById('rte-date').onclick=()=>noteCommand('insertText',new Date().toLocaleString('it-IT'));
+document.getElementById('rte-line').onclick=()=>noteCommand('insertHorizontalRule');
+document.getElementById('rte-fullscreen').onclick=e=>{
+ const expanded=modalNote.classList.toggle('expanded');
+ e.target.textContent=expanded?'Riduci':'Espandi'; e.target.setAttribute('aria-pressed',String(expanded));
+};
+document.getElementById('rte-export').onclick=()=>{
+ const url=URL.createObjectURL(new Blob([noteTitleInput.value+'\n\n'+rteContent.innerText],{type:'text/plain;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download='Nota.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+function updateNoteCount() {
+ const text=rteContent.innerText||'';
+ document.getElementById('note-word-count').textContent=(text.trim()?text.trim().split(/\s+/).length:0)+' parole · '+text.length+' caratteri';
+}
+rteContent.addEventListener('input',updateNoteCount);
+rteContent.addEventListener('keyup',updateRteToolbar);
+rteContent.addEventListener('mouseup',updateRteToolbar);
+rteContent.addEventListener('paste',e=>{
+ e.preventDefault();
+ noteCommand('insertText',e.clipboardData.getData('text/plain'));
+});
+function updateRteToolbar() {
+ for(const btn of document.querySelectorAll('.rte-btn[data-cmd]')) {
+  const active=['bold','italic','underline','strikeThrough','insertUnorderedList','insertOrderedList'].includes(btn.dataset.cmd) && document.queryCommandState(btn.dataset.cmd);
+  btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));
+ }
+}
+// =============================================
+//  MODAL HELPERS
+// =============================================
+function openModal(overlay) {
+ overlay.classList.add('active');
+ if(overlay===modalNote) {noteSelection=null; updateNoteCount();}
+}
+function closeModal(overlay) { overlay.classList.remove('active'); }
+
+[modalOffice, modalEmployee, modalNote].forEach(m => {
+  let mousedownOnBackdrop = false;
+  m.addEventListener('mousedown', e => {
+    mousedownOnBackdrop = (e.target === m);
+  });
+  m.addEventListener('click', e => {
+    if (e.target === m && mousedownOnBackdrop) closeModal(m);
+    mousedownOnBackdrop = false;
+  });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(modalOffice); closeModal(modalEmployee); closeModal(modalNote); closeConfirm(); }
+});
+
+// =============================================
+//  CONFIRM
+// =============================================
+let confirmCallback = null;
+function showConfirm(title, msg, onOk, okLabel = 'Elimina', isDanger = true) {
+  confirmTitle.textContent = title; confirmMsg.textContent = msg;
+  confirmOkBtn.textContent = okLabel;
+  confirmOkBtn.className = isDanger ? 'btn btn-danger' : 'btn btn-primary';
+  confirmCallback = onOk;
+  confirmOverlay.classList.add('active');
+}
+function closeConfirm() { confirmOverlay.classList.remove('active'); confirmCallback = null; }
+confirmOkBtn.addEventListener('click', async () => { if (confirmCallback) await confirmCallback(); closeConfirm(); });
+confirmCancelBtn.addEventListener('click', closeConfirm);
+confirmOverlay.addEventListener('click', e => { if (e.target === confirmOverlay) closeConfirm(); });
+
+// =============================================
+//  TOAST
+// =============================================
+function showToast(message, type = 'info') {
+  const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+  const container = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="fa-solid ${icons[type]||icons.info}" aria-hidden="true">•</span> ${escHtml(message)}`;
+  container.appendChild(t);
+  setTimeout(() => { t.classList.add('hide'); t.addEventListener('animationend', () => t.remove()); }, 3500);
+}
+
+// =============================================
+//  UTILS
+// =============================================
+function escHtml(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function abbr(name) { return (name||'').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,3); }
+function hexToRgba(hex, alpha) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+
+let selectedNavigationOffice = null;
+function renderOfficeNavigation() {
+ const nav=document.getElementById('office-navigation');
+ nav.innerHTML=offices.map(o=>'<button type="button" class="office-nav-button" data-nav-office="'+escHtml(o.id)+'" aria-current="'+(selectedNavigationOffice===o.id)+'"><span class="office-nav-dot" style="background:'+o.colore+'"></span><span class="office-nav-name">'+escHtml(o.nome)+'</span><span class="office-nav-count">'+employees.filter(e=>e.ufficioId===o.id).length+'</span></button>').join('') + '<button type="button" class="office-nav-button notes-nav-button" data-nav-office="__notes__" aria-current="'+(selectedNavigationOffice==='__notes__')+'"><span class="office-nav-dot" style="background:#eab308"></span><span class="office-nav-name">Note</span><span class="office-nav-count">'+notes.length+'</span></button>';
+}
+document.getElementById('office-navigation').addEventListener('click',event=>{
+ const button=event.target.closest('[data-nav-office]'); if(!button) return;
+ const id=button.dataset.navOffice;
+ selectedNavigationOffice=id; searchTerm=''; searchInput.value='';
+ if(id==='__notes__') {
+  notes.forEach(note=>openNotes.add(note.id));
+  renderAll(); renderNotes();
+  const section=document.getElementById('notes-section');
+  section.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+  section.setAttribute('tabindex','-1'); section.focus({preventScroll:true});
+  return;
+ }
+ openOffices.add(id); renderAll();
+ const card=[...document.querySelectorAll('.office-card')].find(c=>c.dataset.officeId===id);
+ if(card) {
+  const behavior=window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+  if(id===offices[0]?.id) window.scrollTo({top:0,behavior});
+  else card.scrollIntoView({behavior,block:'start'});
+  const header=card.querySelector('.office-header');
+  header.setAttribute('tabindex','-1'); header.focus({preventScroll:true});
+ }
+});
+
+initializeLocalApp();
+
+
+document.getElementById('btn-print-all').addEventListener('click', () => {
+ if (!offices.length) { showToast('Attendi il caricamento degli uffici', 'warning'); return; }
+ searchTerm = ''; searchInput.value = '';
+ offices.forEach(o => openOffices.add(o.id));
+ renderAll();
+ requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+});
+document.getElementById('btn-export-names').addEventListener('click', () => {
+ if (!offices.length) { showToast('Attendi il caricamento degli uffici', 'warning'); return; }
+ const data = { uffici: offices.map(o => ({ ufficio: o.nome, dipendenti: employees.filter(e => e.ufficioId === o.id).map(e => ({nome: e.nome, cognome: e.cognome})) })) };
+ const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type:'application/json'}));
+ const a = document.createElement('a'); a.href = url; a.download = 'Uffici_Dipendenti.json'; a.click();
+ setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+function downloadJson(data,name) {
+ const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+ const a=document.createElement('a'); a.href=url; a.download=name; a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+document.getElementById('backup-export').onclick=()=>downloadJson(localData,'Rubrica_Backup_'+new Date().toISOString().slice(0,10)+'.json');
+document.getElementById('backup-import').onclick=()=>document.getElementById('backup-file').click();
+document.getElementById('backup-file').onchange=async event=>{
+ const file=event.target.files[0]; if(!file) return;
+ try {
+  if(file.size>10000000) throw Error('Backup troppo grande');
+  const next=validateData(JSON.parse(await file.text()));
+  if(!confirm('Sostituire i dati locali con il backup? Prima della sostituzione verrà scaricato il backup attuale.')) return;
+  downloadJson(localData,'Rubrica_Prima_Importazione.json');
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(next));
+  localData=next; storageIssue=''; syncLocal();
+  document.getElementById('local-status').textContent='Backup importato e salvato in questo browser.';
+  showToast('Backup importato','success');
+ } catch(e) { showToast('Importazione non riuscita: '+e.message,'error'); }
+ finally {event.target.value='';}
+};
+
+document.addEventListener('click', e => {
+ const menu=document.getElementById('functions-menu');
+ if(!menu.contains(e.target) || e.target.closest('.functions-panel button')) menu.open=false;
+});
+document.addEventListener('keydown', e => {
+ if(e.key==='Escape') document.getElementById('functions-menu').open=false;
+});
+</script>
+</body>
+</html>

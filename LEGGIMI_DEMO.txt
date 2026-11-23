@@ -1,0 +1,40 @@
+RUBRICA UFFICI E DIPENDENTI - VERSIONE DIMOSTRATIVA
+
+Il programma è quello usato in ufficio, senza modifiche al funzionamento.
+Sono stati sostituiti solo i dati: uffici, nomi, interni, email e note sono
+inventati e non corrispondono a persone reali. L'ente si chiama
+"Comune di Esempio" e i numeri iniziano con 000.
+
+COME APRIRLA
+Apri Rubrica_Locale.html con Chrome, Edge o Firefox. Non serve Internet
+e non serve installare nulla.
+
+COSA C'È DENTRO
+- 16 uffici e 50 dipendenti, 3 note.
+- Casi da provare:
+  - due persone con lo stesso nome in uffici diversi;
+  - un nome molto lungo, con apostrofo e doppio cognome;
+  - dipendenti senza telefono, con due interni o con un numero esterno
+    segnato come privato;
+  - un ufficio senza dipendenti;
+  - note con elenchi, numeri di esempio e una checklist.
+
+COSA PROVARE
+- Cerca per nome, ufficio o interno.
+- Aggiungi, modifica ed elimina uffici e dipendenti.
+- Scrivi una nota con grassetto, elenchi, checklist, data e ora;
+  esportala in TXT.
+- Stampa o salva in PDF; esporta i nomi; esporta e importa un backup.
+
+DOVE FINISCONO I DATI
+Le modifiche restano salvate in questo browser, su questo computer.
+Per tornare ai dati di prova usa "Importa backup" e scegli
+Backup_dati_di_prova.json, che trovi in questa cartella.
+
+LIMITI
+Non c'è un server né un accesso con password: ogni browser ha la sua copia
+dei dati. Non è un database condiviso fra più persone.
+
+Verifiche fatte in Chrome su Linux con questi dati: apertura, ricerca,
+aggiunta di un ufficio, di un dipendente e di una nota, salvataggio nel
+browser e ritorno ai dati di prova con "Importa backup".

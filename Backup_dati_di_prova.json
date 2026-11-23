@@ -1,0 +1,510 @@
+{
+  "schemaVersion": 1,
+  "uffici": [
+    {
+      "id": "u-anagrafe",
+      "nome": "Anagrafe",
+      "colore": "#1c44cf"
+    },
+    {
+      "id": "u-stato-civile",
+      "nome": "Stato civile",
+      "colore": "#0c6e45"
+    },
+    {
+      "id": "u-protocollo",
+      "nome": "Protocollo",
+      "colore": "#875000"
+    },
+    {
+      "id": "u-segreteria",
+      "nome": "Segreteria",
+      "colore": "#b42318"
+    },
+    {
+      "id": "u-ragioneria",
+      "nome": "Ragioneria",
+      "colore": "#6b21a8"
+    },
+    {
+      "id": "u-tributi",
+      "nome": "Tributi",
+      "colore": "#0e7490"
+    },
+    {
+      "id": "u-ufficio-tecnico",
+      "nome": "Ufficio tecnico",
+      "colore": "#be185d"
+    },
+    {
+      "id": "u-edilizia-privata",
+      "nome": "Edilizia privata",
+      "colore": "#4d7c0f"
+    },
+    {
+      "id": "u-lavori-pubblici",
+      "nome": "Lavori pubblici",
+      "colore": "#1e3a8a"
+    },
+    {
+      "id": "u-polizia-locale",
+      "nome": "Polizia locale",
+      "colore": "#9a3412"
+    },
+    {
+      "id": "u-servizi-sociali",
+      "nome": "Servizi sociali",
+      "colore": "#374151"
+    },
+    {
+      "id": "u-istruzione",
+      "nome": "Istruzione",
+      "colore": "#0f766e"
+    },
+    {
+      "id": "u-biblioteca",
+      "nome": "Biblioteca",
+      "colore": "#a16207"
+    },
+    {
+      "id": "u-commercio",
+      "nome": "Commercio",
+      "colore": "#7c2d12"
+    },
+    {
+      "id": "u-ced",
+      "nome": "CED",
+      "colore": "#155e75"
+    },
+    {
+      "id": "u-messi-comunali",
+      "nome": "Messi comunali",
+      "colore": "#3f6212"
+    }
+  ],
+  "dipendenti": [
+    {
+      "id": "d-001",
+      "nome": "Caterina",
+      "cognome": "Monti",
+      "telefono": "",
+      "telefonoPrivato": false,
+      "ufficioId": "u-anagrafe"
+    },
+    {
+      "id": "d-002",
+      "nome": "Alberto",
+      "cognome": "Bruno",
+      "telefono": "",
+      "telefonoPrivato": false,
+      "ufficioId": "u-anagrafe"
+    },
+    {
+      "id": "d-003",
+      "nome": "Sara",
+      "cognome": "Gallo",
+      "telefono": "203 / 204",
+      "telefonoPrivato": false,
+      "ufficioId": "u-anagrafe"
+    },
+    {
+      "id": "d-004",
+      "nome": "Rosa",
+      "cognome": "Moretti",
+      "telefono": "204",
+      "telefonoPrivato": false,
+      "ufficioId": "u-anagrafe"
+    },
+    {
+      "id": "d-005",
+      "nome": "Battista",
+      "cognome": "Monti",
+      "telefono": "205",
+      "telefonoPrivato": false,
+      "ufficioId": "u-anagrafe"
+    },
+    {
+      "id": "d-006",
+      "nome": "Ermanno",
+      "cognome": "Mariani",
+      "telefono": "207",
+      "telefonoPrivato": false,
+      "ufficioId": "u-stato-civile"
+    },
+    {
+      "id": "d-007",
+      "nome": "Battista",
+      "cognome": "Marini",
+      "telefono": "208 / 209",
+      "telefonoPrivato": false,
+      "ufficioId": "u-stato-civile"
+    },
+    {
+      "id": "d-008",
+      "nome": "Alberto",
+      "cognome": "Costa",
+      "telefono": "209",
+      "telefonoPrivato": false,
+      "ufficioId": "u-protocollo"
+    },
+    {
+      "id": "d-009",
+      "nome": "Gian Luca",
+      "cognome": "Bonetti",
+      "telefono": "212",
+      "telefonoPrivato": false,
+      "ufficioId": "u-protocollo"
+    },
+    {
+      "id": "d-010",
+      "nome": "Bice",
+      "cognome": "Pellegrino",
+      "telefono": "214",
+      "telefonoPrivato": false,
+      "ufficioId": "u-protocollo"
+    },
+    {
+      "id": "d-011",
+      "nome": "Michele",
+      "cognome": "De Luca",
+      "telefono": "216",
+      "telefonoPrivato": false,
+      "ufficioId": "u-segreteria"
+    },
+    {
+      "id": "d-012",
+      "nome": "Federica",
+      "cognome": "Ferraro",
+      "telefono": "217 / 218",
+      "telefonoPrivato": false,
+      "ufficioId": "u-segreteria"
+    },
+    {
+      "id": "d-013",
+      "nome": "Francesca",
+      "cognome": "Sala",
+      "telefono": "218",
+      "telefonoPrivato": false,
+      "ufficioId": "u-segreteria"
+    },
+    {
+      "id": "d-014",
+      "nome": "Giuseppina",
+      "cognome": "Conti",
+      "telefono": "220",
+      "telefonoPrivato": false,
+      "ufficioId": "u-segreteria"
+    },
+    {
+      "id": "d-015",
+      "nome": "Wilma",
+      "cognome": "Dell'Acqua",
+      "telefono": "",
+      "telefonoPrivato": false,
+      "ufficioId": "u-ragioneria"
+    },
+    {
+      "id": "d-016",
+      "nome": "Aldo",
+      "cognome": "Giuliani",
+      "telefono": "",
+      "telefonoPrivato": false,
+      "ufficioId": "u-ragioneria"
+    },
+    {
+      "id": "d-017",
+      "nome": "Agnese",
+      "cognome": "Grassi",
+      "telefono": "226",
+      "telefonoPrivato": false,
+      "ufficioId": "u-ragioneria"
+    },
+    {
+      "id": "d-018",
+      "nome": "Anna",
+      "cognome": "Carbone",
+      "telefono": "000 219 9088",
+      "telefonoPrivato": true,
+      "ufficioId": "u-ragioneria"
+    },
+    {
+      "id": "d-019",
+      "nome": "Bruno",
+      "cognome": "Ferraro",
+      "telefono": "229",
+      "telefonoPrivato": false,
+      "ufficioId": "u-tributi"
+    },
+    {
+      "id": "d-020",
+      "nome": "Chiara",
+      "cognome": "Dell'Acqua",
+      "telefono": "000 511 5552",
+      "telefonoPrivato": true,
+      "ufficioId": "u-tributi"
+    },
+    {
+      "id": "d-021",
+      "nome": "Roberto",
+      "cognome": "Zani",
+      "telefono": "232",
+      "telefonoPrivato": false,
+      "ufficioId": "u-tributi"
+    },
+    {
+      "id": "d-022",
+      "nome": "Laura",
+      "cognome": "Coppola",
+      "telefono": "233 / 234",
+      "telefonoPrivato": false,
+      "ufficioId": "u-tributi"
+    },
+    {
+      "id": "d-023",
+      "nome": "Paolo",
+      "cognome": "Coppola",
+      "telefono": "234",
+      "telefonoPrivato": false,
+      "ufficioId": "u-ufficio-tecnico"
+    },
+    {
+      "id": "d-024",
+      "nome": "Giorgio",
+      "cognome": "Ferraro",
+      "telefono": "235 / 236",
+      "telefonoPrivato": false,
+      "ufficioId": "u-ufficio-tecnico"
+    },
+    {
+      "id": "d-025",
+      "nome": "Noemi",
+      "cognome": "Grasso",
+      "telefono": "236",
+      "telefonoPrivato": false,
+      "ufficioId": "u-ufficio-tecnico"
+    },
+    {
+      "id": "d-026",
+      "nome": "Matteo",
+      "cognome": "Monti",
+      "telefono": "239",
+      "telefonoPrivato": false,
+      "ufficioId": "u-edilizia-privata"
+    },
+    {
+      "id": "d-027",
+      "nome": "Niccolò",
+      "cognome": "Cattaneo",
+      "telefono": "000 313 8219",
+      "telefonoPrivato": true,
+      "ufficioId": "u-edilizia-privata"
+    },
+    {
+      "id": "d-028",
+      "nome": "Vincenzo",
+      "cognome": "Sala",
+      "telefono": "241 / 242",
+      "telefonoPrivato": false,
+      "ufficioId": "u-lavori-pubblici"
+    },
+    {
+      "id": "d-029",
+      "nome": "Ottavio",
+      "cognome": "Costa",
+      "telefono": "243",
+      "telefonoPrivato": false,
+      "ufficioId": "u-lavori-pubblici"
+    },
+    {
+      "id": "d-030",
+      "nome": "Bruno",
+      "cognome": "Farina",
+      "telefono": "244",
+      "telefonoPrivato": false,
+      "ufficioId": "u-lavori-pubblici"
+    },
+    {
+      "id": "d-031",
+      "nome": "Wilma",
+      "cognome": "Palumbo",
+      "telefono": "247 / 248",
+      "telefonoPrivato": false,
+      "ufficioId": "u-polizia-locale"
+    },
+    {
+      "id": "d-032",
+      "nome": "Marta",
+      "cognome": "Benedetti",
+      "telefono": "250",
+      "telefonoPrivato": false,
+      "ufficioId": "u-polizia-locale"
+    },
+    {
+      "id": "d-033",
+      "nome": "Angelo",
+      "cognome": "Sala",
+      "telefono": "252",
+      "telefonoPrivato": false,
+      "ufficioId": "u-polizia-locale"
+    },
+    {
+      "id": "d-034",
+      "nome": "Ettore",
+      "cognome": "Romano",
+      "telefono": "253",
+      "telefonoPrivato": false,
+      "ufficioId": "u-polizia-locale"
+    },
+    {
+      "id": "d-035",
+      "nome": "Caterina",
+      "cognome": "Tonoli",
+      "telefono": "254",
+      "telefonoPrivato": false,
+      "ufficioId": "u-polizia-locale"
+    },
+    {
+      "id": "d-036",
+      "nome": "Giovanna",
+      "cognome": "Parisi",
+      "telefono": "256",
+      "telefonoPrivato": false,
+      "ufficioId": "u-polizia-locale"
+    },
+    {
+      "id": "d-037",
+      "nome": "Concetta",
+      "cognome": "Bonetti",
+      "telefono": "258",
+      "telefonoPrivato": false,
+      "ufficioId": "u-servizi-sociali"
+    },
+    {
+      "id": "d-038",
+      "nome": "Michele",
+      "cognome": "Cattaneo",
+      "telefono": "000 604 6825",
+      "telefonoPrivato": true,
+      "ufficioId": "u-servizi-sociali"
+    },
+    {
+      "id": "d-039",
+      "nome": "Giovanni",
+      "cognome": "Conte",
+      "telefono": "262",
+      "telefonoPrivato": false,
+      "ufficioId": "u-servizi-sociali"
+    },
+    {
+      "id": "d-040",
+      "nome": "Federica",
+      "cognome": "De Angelis",
+      "telefono": "264 / 265",
+      "telefonoPrivato": false,
+      "ufficioId": "u-servizi-sociali"
+    },
+    {
+      "id": "d-041",
+      "nome": "Paolo",
+      "cognome": "Giuliani",
+      "telefono": "265",
+      "telefonoPrivato": false,
+      "ufficioId": "u-istruzione"
+    },
+    {
+      "id": "d-042",
+      "nome": "Noemi",
+      "cognome": "Rossi",
+      "telefono": "268",
+      "telefonoPrivato": false,
+      "ufficioId": "u-istruzione"
+    },
+    {
+      "id": "d-043",
+      "nome": "Giovanna",
+      "cognome": "Moretti",
+      "telefono": "271",
+      "telefonoPrivato": false,
+      "ufficioId": "u-biblioteca"
+    },
+    {
+      "id": "d-044",
+      "nome": "Niccolò",
+      "cognome": "Martini",
+      "telefono": "274",
+      "telefonoPrivato": false,
+      "ufficioId": "u-biblioteca"
+    },
+    {
+      "id": "d-045",
+      "nome": "Giovanna",
+      "cognome": "Monti",
+      "telefono": "277",
+      "telefonoPrivato": false,
+      "ufficioId": "u-commercio"
+    },
+    {
+      "id": "d-046",
+      "nome": "Carlo",
+      "cognome": "Galli",
+      "telefono": "",
+      "telefonoPrivato": false,
+      "ufficioId": "u-ced"
+    },
+    {
+      "id": "d-047",
+      "nome": "Caterina",
+      "cognome": "Giuliani",
+      "telefono": "280 / 281",
+      "telefonoPrivato": false,
+      "ufficioId": "u-ced"
+    },
+    {
+      "id": "d-901",
+      "nome": "Maria",
+      "cognome": "Rossi",
+      "telefono": "251",
+      "telefonoPrivato": false,
+      "ufficioId": "u-anagrafe"
+    },
+    {
+      "id": "d-902",
+      "nome": "Maria",
+      "cognome": "Rossi",
+      "telefono": "318",
+      "telefonoPrivato": false,
+      "ufficioId": "u-tributi"
+    },
+    {
+      "id": "d-903",
+      "nome": "Anna Maria Immacolata",
+      "cognome": "Dell'Acqua Ferraresi",
+      "telefono": "277",
+      "telefonoPrivato": false,
+      "ufficioId": "u-servizi-sociali"
+    }
+  ],
+  "note": [
+    {
+      "id": "n-001",
+      "titolo": "Turni dello sportello",
+      "privata": false,
+      "createdAt": "2026-11-08T09:30:00Z",
+      "testo": "<p><b>Sportello anagrafe</b></p><ul><li>Lunedì e mercoledì: mattina</li><li>Giovedì: pomeriggio su appuntamento</li></ul><p>Esempio di nota con elenco puntato.</p>"
+    },
+    {
+      "id": "n-002",
+      "titolo": "Numeri utili (di esempio)",
+      "privata": false,
+      "createdAt": "2026-11-15T09:30:00Z",
+      "testo": "<p>Assistenza stampanti: <b>000 0000000</b></p><p>Centralino: <b>000 0000000</b></p><p><i>Tutti i numeri di questa rubrica sono inventati.</i></p>"
+    },
+    {
+      "id": "n-003",
+      "titolo": "Da fare questa settimana",
+      "privata": false,
+      "createdAt": "2026-11-19T09:30:00Z",
+      "testo": "<p>☑ Aggiornare gli interni della Polizia locale</p><p>☐ Inserire il nuovo collega del CED</p><p>☐ Esportare il backup della rubrica</p>"
+    }
+  ]
+}
